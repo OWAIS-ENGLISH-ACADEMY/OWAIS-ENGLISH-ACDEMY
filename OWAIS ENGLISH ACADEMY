@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Owais English Academy · Test Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#242424;
+    --paper:#FFFFFF;
+    --paper-2:#F1EFEA;
+    --marigold:#A9834B;
+    --teal:#6B6B66;
+    --charcoal:#242424;
+    --rule:rgba(36,36,36,0.14);
+    --red:#A6402F;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ background:var(--paper); color:var(--charcoal); font-family:'Inter',sans-serif; min-height:100vh; }
+  .display{ font-family:'Fraunces', serif; }
+  .mono{ font-family:'JetBrains Mono', monospace; letter-spacing:0.03em; }
+  a{ color:inherit; }
+  button{ cursor:pointer; font-family:inherit; }
+  ::selection{ background:var(--marigold); color:var(--ink); }
+
+  .wrap{ max-width:760px; margin:0 auto; padding:40px 6vw 80px; min-height:100vh; }
+  header.topbar{ display:flex; align-items:center; justify-content:space-between; margin-bottom:60px; }
+  .logo{ display:flex; align-items:center; gap:12px; }
+  .logo-mark{ width:44px; height:44px; flex-shrink:0; overflow:hidden; }
+  .logo-mark img{ width:100%; height:100%; object-fit:contain; display:block; }
+  .logo-text{ font-family:'Fraunces',serif; font-weight:600; font-size:1.15rem; color:var(--ink); }
+  .logo-text small{ display:block; font-family:'JetBrains Mono',monospace; font-size:0.6rem; letter-spacing:0.1em; color:var(--teal); font-weight:400; }
+  .exit-link{ font-size:0.85rem; color:var(--teal); font-family:'JetBrains Mono',monospace; display:none; }
+
+  .screen{ display:none; }
+  .screen.active{ display:block; }
+
+  .eyebrow{ font-size:0.75rem; text-transform:uppercase; letter-spacing:0.14em; color:var(--teal); margin-bottom:12px; display:flex; align-items:center; gap:10px; }
+  .eyebrow::before{ content:""; width:28px; height:1px; background:var(--teal); }
+  h1.page-title{ font-family:'Fraunces',serif; font-size:clamp(1.8rem,5vw,2.6rem); font-weight:600; color:var(--ink); margin-bottom:10px; }
+  .page-sub{ color:var(--charcoal); line-height:1.7; max-width:480px; margin-bottom:40px; }
+
+  .home-cards{ display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-top:20px; }
+  .home-card{ background:var(--ink); color:var(--paper); padding:38px 28px; border:1px solid var(--ink); cursor:pointer;
+    transition:background .25s ease, transform .2s ease; text-align:left; }
+  .home-card:hover{ background:#333333; transform:translateY(-2px); }
+  .home-card .icon{ font-size:1.8rem; margin-bottom:16px; display:block; }
+  .home-card .title{ font-family:'Fraunces',serif; font-size:1.3rem; font-weight:600; margin-bottom:8px; }
+  .home-card .desc{ font-size:0.85rem; color:rgba(247,241,227,0.7); line-height:1.6; }
+
+  .field{ margin-bottom:20px; }
+  .field label{ display:block; font-family:'JetBrains Mono',monospace; font-size:0.72rem; letter-spacing:0.08em; color:var(--teal); text-transform:uppercase; margin-bottom:8px; }
+  .field input, .field select, .field textarea{
+    width:100%; padding:13px 14px; border:1px solid var(--rule); background:var(--paper); color:var(--charcoal);
+    font-family:'Inter',sans-serif; font-size:1rem; }
+  .field input:focus, .field select:focus, .field textarea:focus{ outline:none; border-color:var(--marigold); }
+
+  .btn{ padding:13px 26px; border-radius:2px; font-size:0.95rem; font-weight:600; border:1px solid var(--ink); background:none; transition:all .2s ease; }
+  .btn-primary{ background:var(--ink); color:var(--paper); }
+  .btn-primary:hover{ background:var(--marigold); border-color:var(--marigold); color:var(--ink); }
+  .btn-ghost{ color:var(--ink); }
+  .btn-ghost:hover{ background:var(--ink); color:var(--paper); }
+  .btn-danger{ border-color:var(--red); color:var(--red); }
+  .btn-danger:hover{ background:var(--red); color:var(--paper); }
+  .btn-sm{ padding:8px 14px; font-size:0.8rem; }
+  .btn:disabled{ opacity:0.4; cursor:not-allowed; }
+
+  .card{ background:var(--paper-2); border:1px solid var(--rule); padding:24px; margin-bottom:16px; }
+  .card-row{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
+  .card-row .name{ font-family:'Fraunces',serif; font-weight:600; font-size:1.05rem; color:var(--ink); }
+  .card-actions{ display:flex; gap:8px; align-items:center; }
+
+  .tabs{ display:flex; gap:0; border-bottom:1px solid var(--rule); margin-bottom:30px; }
+  .tab{ padding:12px 20px; font-size:0.9rem; font-family:'JetBrains Mono',monospace; color:var(--teal); border-bottom:2px solid transparent; background:none; border-top:none; border-left:none; border-right:none; }
+  .tab.active{ color:var(--ink); border-bottom-color:var(--marigold); font-weight:600; }
+
+  .empty-note{ color:var(--teal); font-family:'JetBrains Mono',monospace; font-size:0.85rem; padding:20px 0; }
+
+  .opt-row{ display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+  .opt-row input[type="text"]{ flex:1; }
+  .opt-row input[type="radio"]{ width:18px; height:18px; accent-color:var(--marigold); }
+
+  .progress-bar{ height:4px; background:var(--rule); margin-bottom:36px; overflow:hidden; }
+  .progress-fill{ height:100%; width:0%; background:var(--marigold); transition:width .3s ease; }
+  .quiz-box{ background:var(--paper-2); border:1px solid var(--rule); padding:34px; }
+  .quiz-q-num{ font-size:0.75rem; color:var(--teal); margin-bottom:10px; }
+  .quiz-q{ font-family:'Fraunces',serif; font-size:1.3rem; font-weight:500; color:var(--ink); margin-bottom:22px; }
+  .quiz-options label{ display:flex; align-items:center; gap:12px; padding:13px 16px; border:1px solid var(--rule); cursor:pointer; margin-bottom:10px; transition:border-color .2s ease; background:var(--paper); }
+  .quiz-options label:hover{ border-color:var(--marigold); }
+  .quiz-nav{ display:flex; justify-content:space-between; margin-top:24px; }
+
+  #testResult{ padding:20px 0; }
+  .score-block{ text-align:center; padding-bottom:24px; border-bottom:1px solid var(--rule); margin-bottom:24px; }
+  .score-block .score-big{ font-family:'Fraunces',serif; font-size:3rem; font-weight:700; color:var(--ink); margin:12px 0 6px; }
+  .score-block .score-label{ font-family:'JetBrains Mono',monospace; color:var(--teal); font-size:0.85rem; }
+  .pass-fail-badge{ display:inline-block; padding:7px 22px; border-radius:2px; font-family:'JetBrains Mono',monospace; font-size:0.85rem; letter-spacing:0.1em; text-transform:uppercase; font-weight:600; margin:8px 0 14px; }
+  .pass-fail-badge.pass{ background:var(--marigold); color:var(--ink); }
+  .pass-fail-badge.fail{ background:var(--red); color:#fff; }
+
+  .ai-block{ }
+  .ai-badge{ display:inline-flex; align-items:center; gap:6px; font-family:'JetBrains Mono',monospace; font-size:0.7rem; letter-spacing:0.08em; color:var(--teal); text-transform:uppercase; margin-bottom:14px; }
+  .ai-badge::before{ content:"✦"; color:var(--marigold); }
+  .ai-level{ font-family:'Fraunces',serif; font-weight:600; font-size:1.4rem; color:var(--ink); margin-bottom:14px; }
+  .ai-feedback{ line-height:1.85; color:var(--charcoal); margin-bottom:20px; }
+  .ai-cols{ display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  .ai-col h4{ font-family:'JetBrains Mono',monospace; font-size:0.7rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--teal); margin-bottom:10px; }
+  .ai-col ul{ padding-left:18px; line-height:1.7; font-size:0.92rem; }
+  .ai-loading{ text-align:center; padding:30px 0; color:var(--teal); font-family:'JetBrains Mono',monospace; font-size:0.85rem; }
+  .ai-loading .dots::after{ content:"..."; animation:dots 1.2s steps(4,end) infinite; }
+  @keyframes dots{ 0%{content:"";} 25%{content:".";} 50%{content:"..";} 75%,100%{content:"...";} }
+
+  table.results-table{ width:100%; border-collapse:collapse; font-size:0.88rem; }
+  table.results-table th{ text-align:left; padding:10px 8px; font-family:'JetBrains Mono',monospace; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--teal); border-bottom:1px solid var(--rule); }
+  table.results-table td{ padding:10px 8px; border-bottom:1px solid var(--rule); }
+
+  .loading{ font-family:'JetBrains Mono',monospace; color:var(--teal); font-size:0.85rem; padding:20px 0; }
+  .error-msg{ color:var(--red); font-family:'JetBrains Mono',monospace; font-size:0.82rem; margin-top:8px; }
+
+  footer.foot{ text-align:center; color:var(--teal); font-family:'JetBrains Mono',monospace; font-size:0.75rem; margin-top:60px; }
+
+  a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible{ outline:2px solid var(--marigold); outline-offset:2px; }
+
+  @media (max-width:600px){
+    .home-cards{ grid-template-columns:1fr; }
+    .ai-cols{ grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="topbar">
+    <div class="logo">
+      <div class="logo-mark"><img src="data:image/jpeg;base64,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" alt="Owais English Academy logo"></div>
+      <div class="logo-text">Owais English Academy<small>TEST PORTAL</small></div>
+    </div>
+    <a href="#" class="exit-link" id="exitLink">← Back to home</a>
+  </header>
+
+  <!-- HOME -->
+  <div class="screen active" id="screen-home">
+    <div class="eyebrow">Test Portal</div>
+    <h1 class="page-title">Who's logging in?</h1>
+    <p class="page-sub">Teachers manage topics and questions from the admin panel. Students log in with their name to take a test and get an AI-generated result instantly.</p>
+    <div class="home-cards">
+      <button class="home-card" id="goAdminLogin">
+        <span class="icon">🔑</span>
+        <div class="title">Admin Login</div>
+        <div class="desc">Add topics, write questions, and view student results.</div>
+      </button>
+      <button class="home-card" id="goStudentLogin">
+        <span class="icon">🧑‍🎓</span>
+        <div class="title">Student Login</div>
+        <div class="desc">Enter your name, pick a topic, and start your test.</div>
+      </button>
+    </div>
+  </div>
+
+  <!-- ADMIN LOGIN -->
+  <div class="screen" id="screen-admin-login">
+    <div class="eyebrow">Admin</div>
+    <h1 class="page-title">Admin Login</h1>
+    <p class="page-sub">Enter the admin password to manage topics and questions.</p>
+    <div class="field"><label>Password</label><input type="password" id="adminPassword" placeholder="Enter password"></div>
+    <div class="error-msg" id="adminLoginError" style="display:none;">Incorrect password. Try again.</div>
+    <div style="display:flex; gap:12px; margin-top:20px;">
+      <button class="btn btn-primary" id="adminLoginBtn">Unlock Panel</button>
+      <button class="btn btn-ghost" id="adminLoginBack">Cancel</button>
+    </div>
+  </div>
+
+  <!-- ADMIN PANEL -->
+  <div class="screen" id="screen-admin-panel">
+    <div class="eyebrow">Admin</div>
+    <h1 class="page-title">Admin Panel</h1>
+    <div class="tabs">
+      <button class="tab active" data-tab="students">Students</button>
+      <button class="tab" data-tab="topics">Topics</button>
+      <button class="tab" data-tab="questions">Questions</button>
+      <button class="tab" data-tab="results">Results</button>
+    </div>
+
+    <div id="tab-students">
+      <div class="field" style="display:flex; gap:10px; align-items:flex-end;">
+        <div style="flex:1;"><label>Student name</label><input type="text" id="newStudentName" placeholder="e.g. Ahmed Raza"></div>
+        <button class="btn btn-primary" id="addStudentBtn">Add Student</button>
+      </div>
+      <div id="studentsList"></div>
+    </div>
+
+    <div id="tab-topics" style="display:none;">
+      <div class="field" style="display:flex; gap:10px; align-items:flex-end;">
+        <div style="flex:1;"><label>New topic name</label><input type="text" id="newTopicName" placeholder="e.g. Tenses"></div>
+        <button class="btn btn-primary" id="addTopicBtn">Add Topic</button>
+      </div>
+      <div id="topicsList"></div>
+    </div>
+
+    <div id="tab-questions" style="display:none;">
+      <div class="field"><label>Select topic</label><select id="qTopicSelect"></select></div>
+      <div id="questionBuilder"></div>
+      <div id="questionsList"></div>
+    </div>
+
+    <div id="tab-results" style="display:none;">
+      <div id="resultsWrap"></div>
+    </div>
+  </div>
+
+  <!-- STUDENT LOGIN -->
+  <div class="screen" id="screen-student-login">
+    <div class="eyebrow">Student</div>
+    <h1 class="page-title">Student Login</h1>
+    <p class="page-sub">Select your name to begin. Not on the list? Ask your teacher to add you.</p>
+    <div class="field"><label>Your name</label><select id="studentName"></select></div>
+    <div class="error-msg" id="studentLoginError" style="display:none;">Please select your name.</div>
+    <div style="display:flex; gap:12px; margin-top:20px;">
+      <button class="btn btn-primary" id="studentLoginBtn">Continue</button>
+      <button class="btn btn-ghost" id="studentLoginBack">Cancel</button>
+    </div>
+  </div>
+
+  <!-- STUDENT TOPIC SELECT -->
+  <div class="screen" id="screen-student-topic">
+    <div class="eyebrow">Student</div>
+    <h1 class="page-title" id="welcomeStudent">Select Topic</h1>
+    <p class="page-sub">Choose a topic to start your test.</p>
+    <div id="studentTopicsList"></div>
+  </div>
+
+  <!-- TEST TAKING -->
+  <div class="screen" id="screen-test">
+    <div class="eyebrow" id="testTopicLabel">Test</div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="quiz-box" id="quizBox">
+      <div class="quiz-q-num mono" id="qNum">QUESTION 1</div>
+      <div class="quiz-q" id="qText"></div>
+      <div class="quiz-options" id="qOptions"></div>
+      <div class="quiz-nav">
+        <button class="btn btn-ghost" id="prevQBtn">Back</button>
+        <button class="btn btn-primary" id="nextQBtn">Next</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="screen" id="screen-result">
+    <div class="eyebrow">Result</div>
+    <h1 class="page-title">Test Complete</h1>
+    <div class="quiz-box" id="testResult">
+      <div class="score-block">
+        <div class="score-label mono" id="resultName"></div>
+        <div class="score-big" id="resultScore"></div>
+        <div class="pass-fail-badge" id="resultPassFail"></div>
+        <div class="score-label mono" id="resultOutOf"></div>
+      </div>
+      <div class="ai-block" id="aiBlock">
+        <div class="ai-loading" id="aiLoading">Analyzing your answers with AI<span class="dots"></span></div>
+        <div id="aiContent" style="display:none;"></div>
+        <div class="error-msg" id="aiError" style="display:none;">Couldn't generate AI feedback right now, but your score above is final.</div>
+      </div>
+    </div>
+    <div style="display:flex; gap:12px; margin-top:24px;">
+      <button class="btn btn-primary" id="backHomeBtn">Back to Home</button>
+    </div>
+  </div>
+
+  <footer class="foot">Owais English Academy · Test Portal</footer>
+</div>
+
+<script>
+/* ---------------- storage helpers (with in-memory fallback) ---------------- */
+const _memoryStore = {};
+function getStorageBackend(){
+  if(window.storage && typeof window.storage.get === 'function'){ return window.storage; }
+  return {
+    async get(key){
+      if(Object.prototype.hasOwnProperty.call(_memoryStore, key)) return { key, value: _memoryStore[key] };
+      throw new Error('not found');
+    },
+    async set(key, value){ _memoryStore[key] = value; return { key, value }; },
+    async delete(key){ delete _memoryStore[key]; return { key, deleted:true }; },
+    async list(prefix){ return { keys: Object.keys(_memoryStore).filter(k => !prefix || k.startsWith(prefix)) }; }
+  };
+}
+async function storeGet(key, fallback){
+  try{ const r = await getStorageBackend().get(key, true); return r ? JSON.parse(r.value) : fallback; }
+  catch(e){ return fallback; }
+}
+async function storeSet(key, value){
+  try{ await getStorageBackend().set(key, JSON.stringify(value), true); }
+  catch(e){ console.error('storage set failed', key, e); }
+}
+
+const ADMIN_PASSWORD = 'owais123';
+let currentStudent = { name: '', topicId: '', topicName: '' };
+let currentQuestions = [];
+let currentIndex = 0;
+let currentAnswers = [];
+
+/* ---------------- seed default data ---------------- */
+async function seedIfEmpty(){
+  const topics = await storeGet('topics', null);
+  if(topics === null){
+    const seedTopics = [
+      { id: 'grammar', name: 'Grammar' },
+      { id: 'vocabulary', name: 'Vocabulary' },
+      { id: 'tenses', name: 'Tenses' }
+    ];
+    await storeSet('topics', seedTopics);
+    await storeSet('questions:grammar', [
+      { id:'g1', text:'Choose the correct sentence:', options:['She go to school.', 'She goes to school.', 'She going to school.'], correct:1 },
+      { id:'g2', text:'Fill in the blank: "I ___ my homework already."', options:['have finished','am finished','finish'], correct:0 }
+    ]);
+    await storeSet('questions:vocabulary', [
+      { id:'v1', text:'What is the opposite of "generous"?', options:['Kind','Stingy','Happy'], correct:1 }
+    ]);
+    await storeSet('questions:tenses', [
+      { id:'t1', text:'"He ___ to the market yesterday." (past tense of go)', options:['go','goed','went'], correct:2 }
+    ]);
+    await storeSet('results', []);
+  }
+  const students = await storeGet('students', null);
+  if(students === null){ await storeSet('students', []); }
+}
+
+/* ---------------- screen navigation ---------------- */
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.getElementById('exitLink').style.display = id === 'screen-home' ? 'none' : 'block';
+}
+document.getElementById('exitLink').addEventListener('click', (e) => { e.preventDefault(); showScreen('screen-home'); });
+document.getElementById('goAdminLogin').addEventListener('click', () => showScreen('screen-admin-login'));
+document.getElementById('adminLoginBack').addEventListener('click', () => showScreen('screen-home'));
+document.getElementById('goStudentLogin').addEventListener('click', async () => {
+  await populateStudentDropdown();
+  showScreen('screen-student-login');
+});
+
+async function populateStudentDropdown(){
+  const select = document.getElementById('studentName');
+  const students = await storeGet('students', []);
+  if(students.length === 0){
+    select.innerHTML = '<option value="">No students added yet</option>';
+    select.disabled = true;
+  } else {
+    select.disabled = false;
+    select.innerHTML = '<option value="">Select your name</option>' + students.map(s => `<option value="${escapeHtml(s.name)}">${escapeHtml(s.name)}</option>`).join('');
+  }
+}
+document.getElementById('studentLoginBack').addEventListener('click', () => showScreen('screen-home'));
+document.getElementById('backHomeBtn').addEventListener('click', () => showScreen('screen-home'));
+
+/* ---------------- admin login ---------------- */
+document.getElementById('adminLoginBtn').addEventListener('click', () => {
+  const pw = document.getElementById('adminPassword').value;
+  if(pw === ADMIN_PASSWORD){
+    document.getElementById('adminLoginError').style.display = 'none';
+    document.getElementById('adminPassword').value = '';
+    renderAdminPanel();
+    showScreen('screen-admin-panel');
+  } else {
+    document.getElementById('adminLoginError').style.display = 'block';
+  }
+});
+
+/* ---------------- admin tabs ---------------- */
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    const target = tab.dataset.tab;
+    document.getElementById('tab-students').style.display = target === 'students' ? 'block' : 'none';
+    document.getElementById('tab-topics').style.display = target === 'topics' ? 'block' : 'none';
+    document.getElementById('tab-questions').style.display = target === 'questions' ? 'block' : 'none';
+    document.getElementById('tab-results').style.display = target === 'results' ? 'block' : 'none';
+    if(target === 'students') renderStudentsTab();
+    if(target === 'questions') renderQuestionsTab();
+    if(target === 'results') renderResultsTab();
+  });
+});
+
+async function renderAdminPanel(){ await renderStudentsTab(); }
+
+/* ---------------- students management ---------------- */
+async function renderStudentsTab(){
+  const list = document.getElementById('studentsList');
+  list.innerHTML = '<div class="loading">Loading students…</div>';
+  const students = await storeGet('students', []);
+  if(students.length === 0){ list.innerHTML = '<div class="empty-note">No students added yet. Add one above — only added students can log in and take a test.</div>'; return; }
+  list.innerHTML = '';
+  students.forEach(s => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `<div class="card-row">
+        <div class="name">${escapeHtml(s.name)}</div>
+        <div class="card-actions"><button class="btn btn-sm btn-danger" data-id="${s.id}">Remove</button></div>
+      </div>`;
+    card.querySelector('button').addEventListener('click', async () => {
+      const students2 = await storeGet('students', []);
+      await storeSet('students', students2.filter(x => x.id !== s.id));
+      renderStudentsTab();
+    });
+    list.appendChild(card);
+  });
+}
+
+document.getElementById('addStudentBtn').addEventListener('click', async () => {
+  const input = document.getElementById('newStudentName');
+  const name = input.value.trim();
+  if(!name) return;
+  const students = await storeGet('students', []);
+  if(students.some(s => s.name.toLowerCase() === name.toLowerCase())){ input.value = ''; return; }
+  const id = 's' + Date.now().toString(36);
+  students.push({ id, name });
+  await storeSet('students', students);
+  input.value = '';
+  renderStudentsTab();
+});
+
+/* ---------------- topics management ---------------- */
+async function renderTopicsTab(){
+  const list = document.getElementById('topicsList');
+  list.innerHTML = '<div class="loading">Loading topics…</div>';
+  const topics = await storeGet('topics', []);
+  if(topics.length === 0){ list.innerHTML = '<div class="empty-note">No topics yet. Add one above.</div>'; return; }
+  list.innerHTML = '';
+  topics.forEach(t => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `<div class="card-row">
+        <div class="name">${escapeHtml(t.name)}</div>
+        <div class="card-actions"><button class="btn btn-sm btn-danger" data-id="${t.id}">Delete</button></div>
+      </div>`;
+    card.querySelector('button').addEventListener('click', async () => {
+      const topics2 = await storeGet('topics', []);
+      await storeSet('topics', topics2.filter(x => x.id !== t.id));
+      await storeSet('questions:' + t.id, []);
+      renderTopicsTab();
+    });
+    list.appendChild(card);
+  });
+}
+
+document.getElementById('addTopicBtn').addEventListener('click', async () => {
+  const input = document.getElementById('newTopicName');
+  const name = input.value.trim();
+  if(!name) return;
+  const id = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') + '-' + Date.now().toString(36).slice(-4);
+  const topics = await storeGet('topics', []);
+  topics.push({ id, name });
+  await storeSet('topics', topics);
+  input.value = '';
+  renderTopicsTab();
+});
+
+/* ---------------- questions management ---------------- */
+async function renderQuestionsTab(){
+  const select = document.getElementById('qTopicSelect');
+  const topics = await storeGet('topics', []);
+  select.innerHTML = topics.map(t => `<option value="${t.id}">${escapeHtml(t.name)}</option>`).join('');
+  if(topics.length === 0){
+    document.getElementById('questionBuilder').innerHTML = '<div class="empty-note">Add a topic first.</div>';
+    document.getElementById('questionsList').innerHTML = '';
+    return;
+  }
+  renderQuestionBuilder(select.value);
+  select.onchange = () => renderQuestionBuilder(select.value);
+}
+
+function renderQuestionBuilder(topicId){
+  const builder = document.getElementById('questionBuilder');
+  builder.innerHTML = `
+    <div class="card">
+      <div class="field"><label>Question text</label><input type="text" id="newQText" placeholder="Type the question"></div>
+      <div class="field"><label>Options (mark the correct one)</label>
+        <div class="opt-row"><input type="radio" name="correctOpt" value="0" checked><input type="text" id="opt0" placeholder="Option A"></div>
+        <div class="opt-row"><input type="radio" name="correctOpt" value="1"><input type="text" id="opt1" placeholder="Option B"></div>
+        <div class="opt-row"><input type="radio" name="correctOpt" value="2"><input type="text" id="opt2" placeholder="Option C"></div>
+      </div>
+      <button class="btn btn-primary btn-sm" id="addQuestionBtn">Add Question</button>
+    </div>`;
+  document.getElementById('addQuestionBtn').addEventListener('click', async () => {
+    const text = document.getElementById('newQText').value.trim();
+    const opt0 = document.getElementById('opt0').value.trim();
+    const opt1 = document.getElementById('opt1').value.trim();
+    const opt2 = document.getElementById('opt2').value.trim();
+    const correct = parseInt(document.querySelector('input[name="correctOpt"]:checked').value);
+    if(!text || !opt0 || !opt1 || !opt2) return;
+    const questions = await storeGet('questions:' + topicId, []);
+    questions.push({ id: 'q' + Date.now().toString(36), text, options: [opt0, opt1, opt2], correct });
+    await storeSet('questions:' + topicId, questions);
+    renderQuestionBuilder(topicId);
+    renderQuestionsList(topicId);
+  });
+  renderQuestionsList(topicId);
+}
+
+async function renderQuestionsList(topicId){
+  const list = document.getElementById('questionsList');
+  list.innerHTML = '<div class="loading">Loading questions…</div>';
+  const questions = await storeGet('questions:' + topicId, []);
+  if(questions.length === 0){ list.innerHTML = '<div class="empty-note">No questions yet for this topic.</div>'; return; }
+  list.innerHTML = '';
+  questions.forEach(q => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `<div class="card-row">
+      <div class="name" style="font-family:'Inter',sans-serif; font-weight:600; font-size:0.95rem;">${escapeHtml(q.text)}</div>
+      <div class="card-actions"><button class="btn btn-sm btn-danger">Delete</button></div>
+      </div>
+      <div style="margin-top:8px; font-size:0.85rem; color:var(--teal);">Correct: ${escapeHtml(q.options[q.correct])}</div>`;
+    card.querySelector('button').addEventListener('click', async () => {
+      const qs2 = await storeGet('questions:' + topicId, []);
+      await storeSet('questions:' + topicId, qs2.filter(x => x.id !== q.id));
+      renderQuestionsList(topicId);
+    });
+    list.appendChild(card);
+  });
+}
+
+/* ---------------- results tab ---------------- */
+async function renderResultsTab(){
+  const wrap = document.getElementById('resultsWrap');
+  wrap.innerHTML = '<div class="loading">Loading results…</div>';
+  const results = await storeGet('results', []);
+  if(results.length === 0){ wrap.innerHTML = '<div class="empty-note">No test attempts yet.</div>'; return; }
+  const sorted = [...results].sort((a,b) => b.date - a.date);
+  let rows = sorted.map(r => {
+    const passLabel = r.passed === undefined ? '—' : (r.passed ? 'PASS' : 'FAIL');
+    const passColor = r.passed === undefined ? 'var(--teal)' : (r.passed ? 'var(--marigold)' : 'var(--red)');
+    return `<tr>
+      <td>${escapeHtml(r.name)}</td><td>${escapeHtml(r.topicName)}</td>
+      <td>${r.score}/${r.total}</td>
+      <td style="color:${passColor}; font-weight:600;">${passLabel}</td>
+      <td>${escapeHtml(r.level || '—')}</td>
+      <td>${new Date(r.date).toLocaleString()}</td></tr>`;
+  }).join('');
+  wrap.innerHTML = `<table class="results-table">
+    <thead><tr><th>Student</th><th>Topic</th><th>Score</th><th>Result</th><th>AI Level</th><th>Date</th></tr></thead>
+    <tbody>${rows}</tbody></table>`;
+}
+
+/* ---------------- student flow ---------------- */
+document.getElementById('studentLoginBtn').addEventListener('click', async () => {
+  const name = document.getElementById('studentName').value.trim();
+  if(!name){ document.getElementById('studentLoginError').style.display = 'block'; return; }
+  document.getElementById('studentLoginError').style.display = 'none';
+  currentStudent.name = name;
+  document.getElementById('welcomeStudent').textContent = `Hi ${name}, pick a topic`;
+  await renderStudentTopics();
+  showScreen('screen-student-topic');
+});
+
+async function renderStudentTopics(){
+  const list = document.getElementById('studentTopicsList');
+  list.innerHTML = '<div class="loading">Loading topics…</div>';
+  const topics = await storeGet('topics', []);
+  if(topics.length === 0){ list.innerHTML = '<div class="empty-note">No topics available yet. Ask your teacher.</div>'; return; }
+  list.innerHTML = '';
+  for(const t of topics){
+    const questions = await storeGet('questions:' + t.id, []);
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `<div class="card-row">
+      <div class="name">${escapeHtml(t.name)}</div>
+      <div class="card-actions">
+        <span class="mono" style="font-size:0.75rem; color:var(--teal);">${questions.length} question${questions.length===1?'':'s'}</span>
+        <button class="btn btn-sm btn-primary" ${questions.length===0?'disabled':''}>Start Test</button>
+      </div></div>`;
+    card.querySelector('button').addEventListener('click', () => startTest(t.id, t.name, questions));
+    list.appendChild(card);
+  }
+}
+
+function startTest(topicId, topicName, questions){
+  currentStudent.topicId = topicId;
+  currentStudent.topicName = topicName;
+  currentQuestions = questions;
+  currentIndex = 0;
+  currentAnswers = new Array(questions.length).fill(null);
+  document.getElementById('testTopicLabel').textContent = topicName + ' Test';
+  renderQuestion();
+  showScreen('screen-test');
+}
+
+function renderQuestion(){
+  const item = currentQuestions[currentIndex];
+  document.getElementById('qNum').textContent = `QUESTION ${currentIndex + 1} OF ${currentQuestions.length}`;
+  document.getElementById('qText').textContent = item.text;
+  const opts = document.getElementById('qOptions');
+  opts.innerHTML = '';
+  item.options.forEach((opt, idx) => {
+    const label = document.createElement('label');
+    label.innerHTML = `<input type="radio" name="testOpt" value="${idx}" ${currentAnswers[currentIndex] === idx ? 'checked' : ''}> ${escapeHtml(opt)}`;
+    opts.appendChild(label);
+  });
+  document.getElementById('progressFill').style.width = `${(currentIndex / currentQuestions.length) * 100}%`;
+  document.getElementById('prevQBtn').style.visibility = currentIndex === 0 ? 'hidden' : 'visible';
+  document.getElementById('nextQBtn').textContent = currentIndex === currentQuestions.length - 1 ? 'Submit Test' : 'Next';
+}
+
+document.getElementById('qOptions').addEventListener('change', (e) => {
+  if(e.target.name === 'testOpt') currentAnswers[currentIndex] = parseInt(e.target.value);
+});
+
+document.getElementById('nextQBtn').addEventListener('click', async () => {
+  if(currentAnswers[currentIndex] === null){
+    const qText = document.getElementById('qText');
+    qText.style.color = 'var(--red)';
+    setTimeout(() => { qText.style.color = ''; }, 700);
+    return;
+  }
+  if(currentIndex < currentQuestions.length - 1){ currentIndex++; renderQuestion(); }
+  else { await submitTest(); }
+});
+
+document.getElementById('prevQBtn').addEventListener('click', () => {
+  if(currentIndex > 0){ currentIndex--; renderQuestion(); }
+});
+
+/* ---------------- submit + AI feedback ---------------- */
+async function submitTest(){
+  let score = 0;
+  const detail = currentQuestions.map((q, i) => {
+    const isCorrect = currentAnswers[i] === q.correct;
+    if(isCorrect) score++;
+    return {
+      question: q.text,
+      studentAnswer: q.options[currentAnswers[i]],
+      correctAnswer: q.options[q.correct],
+      isCorrect
+    };
+  });
+
+  document.getElementById('progressFill').style.width = '100%';
+  document.getElementById('resultName').textContent = currentStudent.name.toUpperCase();
+  document.getElementById('resultScore').textContent = `${score} / ${currentQuestions.length}`;
+  document.getElementById('resultOutOf').textContent = currentStudent.topicName;
+
+  const PASS_THRESHOLD = 0.33;
+  const percentage = currentQuestions.length ? (score / currentQuestions.length) : 0;
+  const passed = percentage >= PASS_THRESHOLD;
+  const passFailEl = document.getElementById('resultPassFail');
+  passFailEl.textContent = passed ? 'PASS' : 'FAIL';
+  passFailEl.className = 'pass-fail-badge ' + (passed ? 'pass' : 'fail');
+
+  document.getElementById('aiLoading').style.display = 'block';
+  document.getElementById('aiContent').style.display = 'none';
+  document.getElementById('aiError').style.display = 'none';
+  showScreen('screen-result');
+
+  let aiResult = null;
+  try{
+    aiResult = await getAiFeedback(currentStudent.name, currentStudent.topicName, score, currentQuestions.length, detail);
+  } catch(e){
+    console.error('AI feedback failed', e);
+  }
+
+  document.getElementById('aiLoading').style.display = 'none';
+  let usedFallback = false;
+  if(!aiResult){
+    aiResult = getLocalFeedback(currentStudent.name, score, currentQuestions.length, detail);
+    usedFallback = true;
+  }
+  renderAiFeedback(aiResult, usedFallback);
+
+  const results = await storeGet('results', []);
+  results.push({
+    name: currentStudent.name,
+    topicId: currentStudent.topicId,
+    topicName: currentStudent.topicName,
+    score, total: currentQuestions.length,
+    passed,
+    level: aiResult ? aiResult.level : null,
+    feedback: aiResult ? aiResult.feedback : null,
+    date: Date.now()
+  });
+  await storeSet('results', results);
+}
+
+function getLocalFeedback(name, score, total, detail){
+  const pct = total ? score / total : 0;
+  let level;
+  if(pct < 0.4) level = 'Beginner';
+  else if(pct < 0.75) level = 'Intermediate';
+  else level = 'Advanced';
+
+  const wrong = detail.filter(d => !d.isCorrect);
+  const right = detail.filter(d => d.isCorrect);
+
+  const feedback = pct >= 0.75
+    ? `Great work, ${name}! You answered ${score} out of ${total} correctly — a strong result overall.`
+    : pct >= 0.33
+      ? `Good effort, ${name}. You got ${score} out of ${total} correct. A bit more practice will sharpen the areas below.`
+      : `Thanks for taking the test, ${name}. You scored ${score} out of ${total} — this topic needs more practice before moving ahead.`;
+
+  const strengths = right.slice(0, 3).map(d => d.question);
+  const improve = wrong.slice(0, 3).map(d => d.question);
+
+  return { level, feedback, strengths, improve };
+}
+
+async function getAiFeedback(name, topic, score, total, detail){
+  const prompt = `You are an English language teacher reviewing a student's test result. Respond with ONLY a JSON object, no markdown fences, no preamble.
+
+Student: ${name}
+Topic: ${topic}
+Score: ${score} out of ${total}
+
+Question-by-question breakdown:
+${detail.map((d,i) => `${i+1}. "${d.question}" — Student answered: "${d.studentAnswer}" (${d.isCorrect ? 'Correct' : 'Incorrect, correct answer: ' + d.correctAnswer})`).join('\n')}
+
+Return a JSON object with exactly these keys:
+{
+  "level": one of "Beginner", "Intermediate", "Advanced",
+  "feedback": a warm, specific 2-3 sentence summary of how the student did, written directly to the student,
+  "strengths": an array of 1-3 short strength points (empty array if none clear),
+  "improve": an array of 1-3 short specific areas to improve (empty array if none)
+}`;
+
+  const response = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-6",
+      max_tokens: 1000,
+      messages: [{ role: "user", content: prompt }]
+    })
+  });
+
+  if(!response.ok) throw new Error('API error ' + response.status);
+  const data = await response.json();
+  const textBlock = data.content.find(b => b.type === 'text');
+  if(!textBlock) throw new Error('No text in response');
+  const cleaned = textBlock.text.replace(/```json|```/g, '').trim();
+  const parsed = JSON.parse(cleaned);
+  return parsed;
+}
+
+function renderAiFeedback(result, usedFallback){
+  const content = document.getElementById('aiContent');
+  const strengths = (result.strengths || []).map(s => `<li>${escapeHtml(s)}</li>`).join('');
+  const improve = (result.improve || []).map(s => `<li>${escapeHtml(s)}</li>`).join('');
+  const badgeLabel = usedFallback ? 'Result Summary' : 'AI Generated Result';
+  content.innerHTML = `
+    <div class="ai-badge">${badgeLabel}</div>
+    <div class="ai-level">${escapeHtml(result.level || '')}</div>
+    <div class="ai-feedback">${escapeHtml(result.feedback || '')}</div>
+    <div class="ai-cols">
+      <div class="ai-col"><h4>Strengths</h4><ul>${strengths || '<li>—</li>'}</ul></div>
+      <div class="ai-col"><h4>Focus on</h4><ul>${improve || '<li>—</li>'}</ul></div>
+    </div>
+  `;
+  content.style.display = 'block';
+}
+
+/* ---------------- utils ---------------- */
+function escapeHtml(str){
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+/* ---------------- init ---------------- */
+seedIfEmpty();
+</script>
+</body>
+</html>
