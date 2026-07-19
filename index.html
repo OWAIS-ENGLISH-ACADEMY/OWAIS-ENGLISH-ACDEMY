@@ -84,6 +84,9 @@
   .opt-row input[type="radio"]{ width:18px; height:18px; accent-color:var(--marigold); }
 
   .progress-bar{ height:4px; background:var(--rule); margin-bottom:36px; overflow:hidden; }
+  .test-header-row{ display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+  .timer-display{ font-size:0.95rem; font-weight:600; color:var(--ink); padding:5px 14px; border:1px solid var(--rule); }
+  .timer-display.low{ color:#fff; background:var(--red); border-color:var(--red); }
   .progress-fill{ height:100%; width:0%; background:var(--marigold); transition:width .3s ease; }
   .quiz-box{ background:var(--paper-2); border:1px solid var(--rule); padding:34px; }
   .quiz-q-num{ font-size:0.75rem; color:var(--teal); margin-bottom:10px; }
@@ -233,7 +236,10 @@
 
   <!-- TEST TAKING -->
   <div class="screen" id="screen-test">
-    <div class="eyebrow" id="testTopicLabel">Test</div>
+    <div class="test-header-row">
+      <div class="eyebrow" id="testTopicLabel" style="margin-bottom:0;">Test</div>
+      <div class="timer-display mono" id="timerDisplay">30:00</div>
+    </div>
     <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
     <div class="quiz-box" id="quizBox">
       <div class="quiz-q-num mono" id="qNum">QUESTION 1</div>
@@ -275,9 +281,15 @@
 /* ---------------- storage helpers (Firebase Realtime Database) ---------------- */
 const FIREBASE_URL = 'https://owais-english-academy-default-rtdb.firebaseio.com';
 
+function fetchWithTimeout(url, options, timeoutMs = 8000){
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  return fetch(url, { ...options, signal: controller.signal }).finally(() => clearTimeout(timer));
+}
+
 async function storeGet(key, fallback){
   try{
-    const res = await fetch(`${FIREBASE_URL}/${encodeURIComponent(key)}.json`);
+    const res = await fetchWithTimeout(`${FIREBASE_URL}/${encodeURIComponent(key)}.json`);
     if(!res.ok) return fallback;
     const data = await res.json();
     return (data === null || data === undefined) ? fallback : data;
@@ -285,7 +297,7 @@ async function storeGet(key, fallback){
 }
 async function storeSet(key, value){
   try{
-    await fetch(`${FIREBASE_URL}/${encodeURIComponent(key)}.json`, {
+    await fetchWithTimeout(`${FIREBASE_URL}/${encodeURIComponent(key)}.json`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(value)
@@ -293,7 +305,7 @@ async function storeSet(key, value){
   } catch(e){ console.error('storage set failed', key, e); }
 }
 
-const ADMIN_PASSWORD = 'Allahis1';
+const ADMIN_PASSWORD = 'owais123';
 let currentStudent = { name: '', topicId: '', topicName: '' };
 let currentQuestions = [];
 let currentIndex = 0;
@@ -331,7 +343,7 @@ function showScreen(id){
   document.getElementById(id).classList.add('active');
   document.getElementById('exitLink').style.display = id === 'screen-home' ? 'none' : 'block';
 }
-document.getElementById('exitLink').addEventListener('click', (e) => { e.preventDefault(); showScreen('screen-home'); });
+document.getElementById('exitLink').addEventListener('click', (e) => { e.preventDefault(); stopTestTimer(); showScreen('screen-home'); });
 document.getElementById('goAdminLogin').addEventListener('click', () => showScreen('screen-admin-login'));
 document.getElementById('adminLoginBack').addEventListener('click', () => showScreen('screen-home'));
 document.getElementById('goStudentLogin').addEventListener('click', async () => {
@@ -479,6 +491,7 @@ function renderQuestionBuilder(topicId){
         <div class="opt-row"><input type="radio" name="correctOpt" value="0" checked><input type="text" id="opt0" placeholder="Option A"></div>
         <div class="opt-row"><input type="radio" name="correctOpt" value="1"><input type="text" id="opt1" placeholder="Option B"></div>
         <div class="opt-row"><input type="radio" name="correctOpt" value="2"><input type="text" id="opt2" placeholder="Option C"></div>
+        <div class="opt-row"><input type="radio" name="correctOpt" value="3"><input type="text" id="opt3" placeholder="Option D"></div>
       </div>
       <button class="btn btn-primary btn-sm" id="addQuestionBtn">Add Question</button>
     </div>`;
@@ -487,10 +500,11 @@ function renderQuestionBuilder(topicId){
     const opt0 = document.getElementById('opt0').value.trim();
     const opt1 = document.getElementById('opt1').value.trim();
     const opt2 = document.getElementById('opt2').value.trim();
+    const opt3 = document.getElementById('opt3').value.trim();
     const correct = parseInt(document.querySelector('input[name="correctOpt"]:checked').value);
-    if(!text || !opt0 || !opt1 || !opt2) return;
+    if(!text || !opt0 || !opt1 || !opt2 || !opt3) return;
     const questions = await storeGet('questions:' + topicId, []);
-    questions.push({ id: 'q' + Date.now().toString(36), text, options: [opt0, opt1, opt2], correct });
+    questions.push({ id: 'q' + Date.now().toString(36), text, options: [opt0, opt1, opt2, opt3], correct });
     await storeSet('questions:' + topicId, questions);
     renderQuestionBuilder(topicId);
     renderQuestionsList(topicId);
@@ -575,6 +589,10 @@ async function renderStudentTopics(){
   }
 }
 
+const TEST_DURATION_SECONDS = 30 * 60;
+let testTimerInterval = null;
+let testSecondsLeft = TEST_DURATION_SECONDS;
+
 function startTest(topicId, topicName, questions){
   currentStudent.topicId = topicId;
   currentStudent.topicName = topicName;
@@ -583,7 +601,34 @@ function startTest(topicId, topicName, questions){
   currentAnswers = new Array(questions.length).fill(null);
   document.getElementById('testTopicLabel').textContent = topicName + ' Test';
   renderQuestion();
+  startTestTimer();
   showScreen('screen-test');
+}
+
+function startTestTimer(){
+  stopTestTimer();
+  testSecondsLeft = TEST_DURATION_SECONDS;
+  updateTimerDisplay();
+  testTimerInterval = setInterval(() => {
+    testSecondsLeft--;
+    updateTimerDisplay();
+    if(testSecondsLeft <= 0){
+      stopTestTimer();
+      submitTest();
+    }
+  }, 1000);
+}
+
+function stopTestTimer(){
+  if(testTimerInterval){ clearInterval(testTimerInterval); testTimerInterval = null; }
+}
+
+function updateTimerDisplay(){
+  const el = document.getElementById('timerDisplay');
+  const m = Math.floor(testSecondsLeft / 60);
+  const s = testSecondsLeft % 60;
+  el.textContent = `${m}:${s.toString().padStart(2,'0')}`;
+  el.classList.toggle('low', testSecondsLeft <= 60);
 }
 
 function renderQuestion(){
@@ -623,13 +668,14 @@ document.getElementById('prevQBtn').addEventListener('click', () => {
 
 /* ---------------- submit + AI feedback ---------------- */
 async function submitTest(){
+  stopTestTimer();
   let score = 0;
   const detail = currentQuestions.map((q, i) => {
     const isCorrect = currentAnswers[i] === q.correct;
     if(isCorrect) score++;
     return {
       question: q.text,
-      studentAnswer: q.options[currentAnswers[i]],
+      studentAnswer: currentAnswers[i] === null ? '(no answer)' : q.options[currentAnswers[i]],
       correctAnswer: q.options[q.correct],
       isCorrect
     };
