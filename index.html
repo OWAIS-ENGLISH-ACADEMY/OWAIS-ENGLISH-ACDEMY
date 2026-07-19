@@ -272,27 +272,25 @@
 </div>
 
 <script>
-/* ---------------- storage helpers (with in-memory fallback) ---------------- */
-const _memoryStore = {};
-function getStorageBackend(){
-  if(window.storage && typeof window.storage.get === 'function'){ return window.storage; }
-  return {
-    async get(key){
-      if(Object.prototype.hasOwnProperty.call(_memoryStore, key)) return { key, value: _memoryStore[key] };
-      throw new Error('not found');
-    },
-    async set(key, value){ _memoryStore[key] = value; return { key, value }; },
-    async delete(key){ delete _memoryStore[key]; return { key, deleted:true }; },
-    async list(prefix){ return { keys: Object.keys(_memoryStore).filter(k => !prefix || k.startsWith(prefix)) }; }
-  };
-}
+/* ---------------- storage helpers (Firebase Realtime Database) ---------------- */
+const FIREBASE_URL = 'https://owais-english-academy-default-rtdb.firebaseio.com';
+
 async function storeGet(key, fallback){
-  try{ const r = await getStorageBackend().get(key, true); return r ? JSON.parse(r.value) : fallback; }
-  catch(e){ return fallback; }
+  try{
+    const res = await fetch(`${FIREBASE_URL}/${encodeURIComponent(key)}.json`);
+    if(!res.ok) return fallback;
+    const data = await res.json();
+    return (data === null || data === undefined) ? fallback : data;
+  } catch(e){ console.error('storage get failed', key, e); return fallback; }
 }
 async function storeSet(key, value){
-  try{ await getStorageBackend().set(key, JSON.stringify(value), true); }
-  catch(e){ console.error('storage set failed', key, e); }
+  try{
+    await fetch(`${FIREBASE_URL}/${encodeURIComponent(key)}.json`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(value)
+    });
+  } catch(e){ console.error('storage set failed', key, e); }
 }
 
 const ADMIN_PASSWORD = 'owais123';
